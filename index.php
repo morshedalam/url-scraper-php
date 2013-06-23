@@ -1,5 +1,5 @@
 <?php
-include 'class/website_parser.php';
+include 'website_parser.php';
 
 $links = $images = array();
 $target_url = $_GET['target_url'];
