@@ -12,8 +12,10 @@ $images = $parser->getImageSources();
 
 echo "<pre>";
 print_r($links);
+echo "<br />";
 print_r($images);
 echo "</pre>";
+
 
 /**
  * ==========================================
