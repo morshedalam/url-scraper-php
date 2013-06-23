@@ -1,0 +1,17 @@
+h1. About
+
+A Website parser class to grab website contents and extracts all hyper links and image sources
+
+
+h3. Uses
+
+<pre><code>include 'website_parser.php';
+
+//Instance of WebsiteParser
+$parser = new WebsiteParser('http://morshed-alam.com/');
+
+//Get all hyper links
+$links = $parser->getHrefLinks();
+
+//Get all image sources
+$images = $parser->getImageSources();</code></pre>
