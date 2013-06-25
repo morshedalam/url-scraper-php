@@ -12,6 +12,20 @@
 class WebsiteParser
 {
     /**
+     * Links type
+     */
+    const LINK_TYPE_UNKNOWN   = 0;
+    const LINK_TYPE_ALL      = 1;
+    const LINK_TYPE_INTERNAL = 2;
+    const LINK_TYPE_EXTERNAL = 3;
+
+    /**
+     * Link type
+     * @var integer
+     */
+    protected $link_type = self::LINK_TYPE_ALL;
+
+    /**
      * The target website url to parse
      * @var string
      */
@@ -28,6 +42,12 @@ class WebsiteParser
      * @var  string
      */
     public $absolute_url = '';
+
+    /**
+     * Only domain name
+     * @var string
+     */
+    protected $domain = '';
 
     /**
      * Grabbed html content from target website
@@ -58,6 +78,8 @@ class WebsiteParser
     private $href_filter_pattern = '/\<|#|javascript:void/';
     private $href_expression = '/\<a\s[^>]*href\s*=\s*\"([^\"]*)\"[^>]*>(.*?)<\/a>/';
     private $img_expression = '/<img[^>]+src=([\'"])?((?(1).+?|[^\s>]+))(?(1)\1)/';
+    private $external_link_pattern = "/^(https?:){0,1}\/\/(www\.){0,1}(.*)/i";
+    private $internal_link_pattern = "/^(https?:){0,1}\/\/(www\.){0,1}#domain#/i";
 
     /**
      * cUrl option
@@ -129,12 +151,11 @@ class WebsiteParser
                     if (!(preg_match($this->href_filter_pattern, $url, $filter_out_url)
                         || preg_match($this->href_filter_pattern, $title, $filter_out_link))
                     ) {
-                        if (!preg_match($this->full_link_pattern, $url, $match)) {
-                            if (strpos($url, '/') == 0) {
-                                $url = $this->base_url . $url;
-                            } else {
-                                $url = $this->absolute_url . $url;
-                            }
+                        if (!preg_match($this->full_link_pattern, $url, $match))
+                            $url = $this->sanitizeUrl($url);
+
+                        if ($this->link_type !== self::LINK_TYPE_ALL) {
+                            if ($this->getLinkType($url) !== $this->link_type) continue;
                         }
 
                         $this->href_links[] = array($url, $title);
@@ -167,13 +188,8 @@ class WebsiteParser
 
                 if ($match_image) {
 
-                    if (!preg_match($this->full_link_pattern, $match_image, $match)) {
-                        if (strpos($match_image, '/') == 0) {
-                            $match_image = $this->base_url . $match_image;
-                        } else {
-                            $match_image = $this->absolute_url . $match_image;
-                        }
-                    }
+                    if (!preg_match($this->full_link_pattern, $match_image, $match))
+                        $match_image = $this->sanitizeUrl($match_image);
 
                     $this->image_sources[] = $match_image;
                 }
@@ -209,7 +225,9 @@ class WebsiteParser
     {
         $host = parse_url($this->target_url, PHP_URL_HOST);
         $host = $host ? $host : parse_url($this->target_url, PHP_URL_PATH);
-        $this->base_url = 'http://' . rtrim($host, '/') . '/';
+        $this->base_url = 'http://' . rtrim($host, '/');
+        $this->domain = $host;
+        $this->internal_link_pattern = str_replace("#domain#", $this->domain, $this->internal_link_pattern);
 
         $this->absolute_url = substr($this->target_url, 0, strrpos($this->target_url, '/'));
         $this->absolute_url = $this->absolute_url ? $this->absolute_url . '/' : $this->base_url;
@@ -240,5 +258,28 @@ class WebsiteParser
         }
 
         curl_close($ch);
+    }
+
+    private function sanitizeUrl($url)
+    {
+        if (strpos($url, '/') == 0) {
+            $url = $this->base_url . $url;
+        } else {
+            $url = $this->absolute_url . $url;
+        }
+        return $url;
+    }
+
+    private function getLinkType($url) {
+        if (preg_match($this->internal_link_pattern, $url))
+            return self::LINK_TYPE_INTERNAL;
+        else if (preg_match($this->external_link_pattern, $url))
+            return self::LINK_TYPE_EXTERNAL;
+        return self::LINK_TYPE_UNKNOWN;
+    }
+
+    public function setLinksType($type)
+    {
+        $this->link_type = (int)$type;
     }
 }
