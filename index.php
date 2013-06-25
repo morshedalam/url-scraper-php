@@ -10,6 +10,9 @@ $parser = new WebsiteParser($target_url);
 if (isset($_GET['target_url'])) {
     $default_check = '';
 
+    if ($_GET['link_type'])
+        $parser->setLinksType($_GET['link_type']);
+
     if ($_GET['href'])
         $links = $parser->getHrefLinks();
 
@@ -69,6 +72,11 @@ if (isset($_GET['target_url'])) {
                         <input type="checkbox" name="href" value="1" <?=$_GET['href'] ? 'checked' : $default_check?> /> Href
                         <input type="checkbox" name="image"
                                value="1" <?=$_GET['image'] ? 'checked' : $default_check?> /> Image
+                        <select name="link_type">
+                            <option value="<?=WebsiteParser::LINK_TYPE_ALL?>">All links</option>
+                            <option value="<?=WebsiteParser::LINK_TYPE_INTERNAL?>">Only internal links</option>
+                            <option value="<?=WebsiteParser::LINK_TYPE_EXTERNAL?>">Only external links</option>
+                        </select>
                 </span>
                 <input class="btn btn-primary" type="submit" name="extract" value="Extract Links"/>
             </div>
