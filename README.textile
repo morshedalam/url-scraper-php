@@ -1,7 +1,9 @@
 h1. About
 
+A Website parser class to extract links and images from Web pages. "View Demo":http://www.scripts.morshed-alam.com/url-scraper-php/
+Try it out and Rate on "phpclasses.org":http://www.phpclasses.org/package/8113-PHP-Parse-and-extract-links-and-images-from-Web-pages.html
 
-A Website parser class to grab website contents and extracts all hyper links and image sources
+<img alt="Screenshot" src="https://github.com/morshedalam/url-scraper-php/blob/master/screenshot.png" />
 
 
 h3. Uses
