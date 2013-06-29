@@ -119,6 +119,16 @@ class WebsiteParser
     }
 
     /**
+     * The class destructor.
+     *
+     * Explicitly clears Parser object from memory upon destruction.
+     */
+    public function __destruct()
+    {
+        unset($this);
+    }
+
+    /**
      * A public function to grab and return content
      * @params boolean $grab, flag to perform real time grab or use class content
      * @returned text $content, truncated text
@@ -214,8 +224,10 @@ class WebsiteParser
      */
     public function truncateText($text, $length = 50, $replace_by = '...')
     {
-        if (strlen($text) > $length) {
-            return substr($text, 0, $length - 3) . $replace_by;
+        $new_text = array_shift(explode('_____', wordwrap($text, $length, "_____", false)));
+
+        if (strlen($text) > strlen($new_text)) {
+            return $new_text . $replace_by;
         }
 
         return $text;
