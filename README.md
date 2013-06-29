@@ -1,12 +1,10 @@
 ### About
 
 A Website parser class to extract links and images from Web pages.
-"View Demo":http://www.scripts.morshed-alam.com/url-scraper-php/ :: "Try it out and Rate on phpclasses.org":http://www.phpclasses.org/package/8113-PHP-Parse-and-extract-links-and-images-from-Web-pages.html
+[View Demo](http://www.scripts.morshed-alam.com/url-scraper-php/) or Try it out and Rate on [phpclasses.org](http://www.phpclasses.org/package/8113-PHP-Parse-and-extract-links-and-images-from-Web-pages.html)
+ 
 
-![Screenshot](https://github.com/morshedalam/url-scraper-php/blob/master/screenshot.png)
-
-
-### Uses
+##### Uses
 
 <pre><code>include 'website_parser.php';
 
@@ -21,7 +19,7 @@ $images = $parser->getImageSources();</code></pre>
 
 
 
-### Contributing
+##### Contributing
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
