@@ -249,7 +249,7 @@ class WebsiteParser
     {
         $host = parse_url($this->target_url, PHP_URL_HOST);
         $host = $host ? $host : parse_url($this->target_url, PHP_URL_PATH);
-        $this->base_url = 'http://' . rtrim($host, '/');
+        $this->base_url = 'http://' . rtrim($host, '/') . '/';
         $this->domain = $host;
         $this->internal_link_pattern = str_replace("#domain#", $this->domain, $this->internal_link_pattern);
 

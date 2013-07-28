@@ -32,8 +32,7 @@ if (isset($_GET['target_url'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Morshed Alam">
 
-    <link href="http://twitter.github.io/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
-
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
     <style>
         ul li a {
             font-size: 10px;
@@ -56,6 +55,7 @@ if (isset($_GET['target_url'])) {
     </style>
 </head>
 <body>
+<?php include_once '../nav.html' ?>
 
 <div class="container" style="margin-top: 60px;">
     <div>
