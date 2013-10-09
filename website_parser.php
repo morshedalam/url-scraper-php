@@ -238,12 +238,10 @@ class WebsiteParser
                 $match_tag = trim($match_tag);
 
                 if ($match_tag) {
-                    $this->metatags[$key] = $match_tag;
+                    $this->metatags[] = array($key, $match_tag);
                 }
             }
         }
-
-        $this->metatags = array_unique($this->metatags);
 
         return $this->metatags;
 
