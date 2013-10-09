@@ -15,9 +15,10 @@ $parser = new WebsiteParser('http://morshed-alam.com/');
 $links = $parser->getHrefLinks();
 
 //Get all image sources
-$images = $parser->getImageSources();</code></pre>
+$images = $parser->getImageSources();
 
-
+//Get all metatags and Facebook open graph properties
+$images = $parser->getMetaTags();</code></pre>
 
 ##### Contributing
 
