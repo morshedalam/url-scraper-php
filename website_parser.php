@@ -81,6 +81,10 @@ class WebsiteParser
     private $img_expression = '/<img[^>]+src=([\'"])?((?(1).+?|[^\s>]+))(?(1)\1)/';
     private $external_link_pattern = "/^(https?:){0,1}\/\/(www\.){0,1}(.*)/i";
     private $internal_link_pattern = "/^(https?:){0,1}\/\/(www\.){0,1}#domain#/i";
+    private $title_expression = "/<title>(.*)<\/title>/";
+    // metatags are normaly this form: <meta name="NAME" content="CONTENT" />
+    // Facebook use property "instead" of "name", see here : http://ogp.me/
+    private $metatags_expression = "/<meta[^>]+(?:name|property)=\"([^\"]*)\"[^>]+content=\"([^\"]*)\"[^>]*>/";
 
     /**
      * cUrl option
@@ -212,6 +216,55 @@ class WebsiteParser
         $this->image_sources = array_values(array_unique(array_filter($this->image_sources)));
 
         return $this->image_sources;
+
+    }
+
+    /**
+     * Extract title from grabbed contents
+     * @param boolean $grab, flag to perform real time grab or use class content
+     * @return array, an array of extracted metatags
+     */
+    public function getTitle($grab = false)
+    {
+        if ($grab)
+            $this->grabContent();
+
+        if (!is_null($this->content)) {
+
+            preg_match($this->title_expression, $this->content, $match_title);
+
+        }
+
+        return $match_title[1];
+
+    }
+
+    /**
+     * Extract all metatags sources from grabbed contents
+     * @param boolean $grab, flag to perform real time grab or use class content
+     * @return array, an array of extracted metatags
+     */
+    public function getMetaTags($grab = false)
+    {
+        if ($grab)
+            $this->grabContent();
+
+        if (!is_null($this->content)) {
+
+            preg_match_all($this->metatags_expression, $this->content, $match_tags);
+
+            foreach ($match_tags[2] as $key => $match_tag) {
+
+                $key = trim($match_tags[1][$key]);
+                $match_tag = trim($match_tag);
+
+                if ($match_tag) {
+                    $this->metatags[] = array($key, $match_tag);
+                }
+            }
+        }
+
+        return $this->metatags;
 
     }
 
