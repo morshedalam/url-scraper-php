@@ -2,7 +2,7 @@
 if (count($links)) {
     $count = count($links);
 
-    echo '<h4>Total Links: ' . $count . '</h4>';
+    echo '<h4>Links: ' . $count . '</h4>';
     echo '<div class="row">';
 
     echo '<div class="span4">';

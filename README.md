@@ -17,8 +17,8 @@ $links = $parser->getHrefLinks();
 //Get all image sources
 $images = $parser->getImageSources();
 
-//Get all metatags and Facebook open graph properties
-$images = $parser->getMetaTags();</code></pre>
+//Get all meta tags and Facebook open graph properties
+$meta_tags = $parser->getMetaTags();</code></pre>
 
 ##### Contributing
 
