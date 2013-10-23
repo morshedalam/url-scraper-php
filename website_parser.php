@@ -112,8 +112,8 @@ class WebsiteParser
 
     /**
      * Class constructor
-     * @param string  $url  Target Url to parse
-     * @param string  $link_type  Link type to grab
+     * @param string $url  Target Url to parse
+     * @param string $link_type  Link type to grab
      */
     function __construct($url, $link_type = 'all')
     {
@@ -156,14 +156,13 @@ class WebsiteParser
             $this->grabContent();
 
         if (!is_null($this->content)) {
-            preg_match_all($this->href_expression, $this->content, $match_links);
 
+            preg_match_all($this->href_expression, $this->content, $match_links);
             $unique_urls = array_unique($match_links[1]);
 
             if (count($unique_urls)) {
-
                 foreach ($unique_urls as $index => $url) {
-                    $title = trim($match_links[2][$index] ? $match_links[2][$index] : $url);
+                    $title = $this->findLinkTitle($url, $match_links[2][$index]);
 
                     if (!(preg_match($this->href_filter_pattern, $url, $filter_out_url)
                         || preg_match($this->href_filter_pattern, $title, $filter_out_link))
@@ -355,5 +354,19 @@ class WebsiteParser
             return self::LINK_TYPE_EXTERNAL;
 
         return self::LINK_TYPE_UNKNOWN;
+    }
+
+    private function findLinkTitle($url, $link_content = '')
+    {
+        if (preg_match_all($this->href_filter_pattern, $link_content, $matches)) {
+            if (preg_match_all($this->img_expression, $link_content, $match_images)) {
+                $image_name = substr($match_images[2][0], strripos($match_images[2][0], '/', 1) + 1);
+                return (strlen($match_images[2][0]) > strlen($image_name) ? 'Image:' : '') . $image_name;
+            } else {
+                return $url;
+            }
+        }
+
+        return $link_content;
     }
 }
