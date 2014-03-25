@@ -112,11 +112,13 @@ class WebsiteParser
 
     /**
      * Class constructor
-     * @param string $url  Target Url to parse
-     * @param string $link_type  Link type to grab
+     * @param string $url Target Url to parse
+     * @param string $link_type Link type to grab
      */
     function __construct($url, $link_type = 'all')
     {
+        $this->_isCurl();
+
         $this->target_url = $url;
         $this->setUrls();
         $this->setLinksType($link_type);
@@ -186,7 +188,7 @@ class WebsiteParser
 
     /**
      * Extract all images sources from grabbed contents
-     * @param boolean $grab, flag to perform real time grab or use class content
+     * @param boolean $grab , flag to perform real time grab or use class content
      * @return array, an array of extracted images sources
      */
     public function getImageSources($grab = false)
@@ -198,16 +200,17 @@ class WebsiteParser
 
             preg_match_all($this->img_expression, $this->content, $match_images);
 
-            foreach ($match_images[2] as $match_image) {
+            if (isset($match_images[2]) && count($match_images[2])) {
+                foreach ($match_images[2] as $match_image) {
+                    $match_image = trim($match_image);
 
-                $match_image = trim($match_image);
+                    if ($match_image) {
 
-                if ($match_image) {
+                        if (!preg_match($this->full_link_pattern, $match_image, $match))
+                            $match_image = $this->sanitizeUrl($match_image);
 
-                    if (!preg_match($this->full_link_pattern, $match_image, $match))
-                        $match_image = $this->sanitizeUrl($match_image);
-
-                    $this->image_sources[] = $match_image;
+                        $this->image_sources[] = $match_image;
+                    }
                 }
             }
         }
@@ -220,31 +223,35 @@ class WebsiteParser
 
     /**
      * Extract title from grabbed contents
-     * @param boolean $grab, flag to perform real time grab or use class content
+     * @param boolean $grab , flag to perform real time grab or use class content
      * @return array, an array of extracted metatags
      */
     public function getTitle($grab = false)
     {
+        $title = '';
+
         if ($grab)
             $this->grabContent();
 
         if (!is_null($this->content)) {
 
             preg_match($this->title_expression, $this->content, $match_title);
+            $title = empty($match_title[1]) ? '' : $match_title[1];
 
         }
 
-        return $match_title[1];
-
+        return $title;
     }
 
     /**
      * Extract all metatags sources from grabbed contents
-     * @param boolean $grab, flag to perform real time grab or use class content
+     * @param boolean $grab , flag to perform real time grab or use class content
      * @return array, an array of extracted metatags
      */
     public function getMetaTags($grab = false)
     {
+        $metatags = array();
+
         if ($grab)
             $this->grabContent();
 
@@ -252,19 +259,20 @@ class WebsiteParser
 
             preg_match_all($this->metatags_expression, $this->content, $match_tags);
 
-            foreach ($match_tags[2] as $key => $match_tag) {
+            if (isset($match_tags[2]) && count($match_tags[2])) {
+                foreach ($match_tags[2] as $key => $match_tag) {
 
-                $key = trim($match_tags[1][$key]);
-                $match_tag = trim($match_tag);
+                    $key = trim($match_tags[1][$key]);
+                    $match_tag = trim($match_tag);
 
-                if ($match_tag) {
-                    $this->metatags[] = array($key, $match_tag);
+                    if ($match_tag) {
+                        $metatags[] = array($key, $match_tag);
+                    }
                 }
             }
         }
 
-        return $this->metatags;
-
+        return $metatags;
     }
 
     /**
@@ -276,7 +284,8 @@ class WebsiteParser
      */
     public function truncateText($text, $length = 50, $replace_by = '...')
     {
-        $new_text = array_shift(explode('_____', wordwrap($text, $length, "_____", false)));
+        $text_parts = explode('_____', wordwrap($text, $length, "_____", false));
+        $new_text = array_shift($text_parts);
 
         if (strlen($text) > strlen($new_text)) {
             return $new_text . $replace_by;
@@ -360,13 +369,23 @@ class WebsiteParser
     {
         if (preg_match_all($this->href_filter_pattern, $link_content, $matches)) {
             if (preg_match_all($this->img_expression, $link_content, $match_images)) {
-                $image_name = substr($match_images[2][0], strripos($match_images[2][0], '/', 1) + 1);
-                return (strlen($match_images[2][0]) > strlen($image_name) ? 'Image:' : '') . $image_name;
+                if (isset($match_images[2]) && isset($match_images[2][0])) {
+                    $image_name = substr($match_images[2][0], strripos($match_images[2][0], '/', 1) + 1);
+
+                    return (strlen($match_images[2][0]) > strlen($image_name) ? 'Image:' : '') . $image_name;
+                }
             } else {
                 return $url;
             }
         }
 
         return $link_content;
+    }
+
+    private function _isCurl()
+    {
+        if (!function_exists('curl_version')) {
+            die('cUrl library is not enabled on this server.');
+        }
     }
 }
